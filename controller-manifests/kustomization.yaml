@@ -1,0 +1,14 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- namespace.yaml
+- serviceAccount.yaml
+- clusterRole.yaml
+- clusterRoleBinding.yaml
+- role-key-admin.yaml
+- role-service-proxier.yaml
+- roleBinding-key-admin.yaml
+- roleBinding-service-proxier.yaml
+- service.yaml
+- deployment.yaml
+namespace: sealed-secrets
