@@ -4,8 +4,8 @@ kind: ClusterRole
 metadata:
   name: secrets-unsealer
   labels:
-    app.kubernetes.io/name: sealed-secrets
-    app.kubernetes.io/instance: sealed-secrets
+    app.kubernetes.io/name: sealed-secrets-controller
+    app.kubernetes.io/instance: sealed-secrets-controller
     app.kubernetes.io/version: v0.16.0
 rules:
   - apiGroups:

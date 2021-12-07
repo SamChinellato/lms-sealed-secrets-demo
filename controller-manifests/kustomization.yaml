@@ -11,4 +11,16 @@ resources:
 - roleBinding-service-proxier.yaml
 - service.yaml
 - deployment.yaml
+- clusterRole-secrets-unsealer.yaml
+- customResourceDefinition.yaml
+- roleBinding-secret-unsealer.yaml
+# Kustomize dynamically removes security constraints from the SealedSecret deployment
+# so it can play nice with OSHFT
+patchesJson6902:
+- path: securityContext-patch.yaml
+  target:
+    group: apps
+    kind: Deployment
+    name: sealed-secrets-controller
+    version: v1
 namespace: sealed-secrets

@@ -1,25 +1,15 @@
-# Set sealed secrets controller namespace-only permissions (for key admin)
-apiVersion: rbac.authorization.k8s.io/v1
+apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: Role
 metadata:
-  name: sealed-secrets-key-admin
+  annotations: {}
   labels:
-    app.kubernetes.io/name: sealed-secrets
-    app.kubernetes.io/instance: sealed-secrets
-    app.kubernetes.io/version: v0.16.0
+    name: sealed-secrets-key-admin
+  name: sealed-secrets-key-admin
 rules:
-  - apiGroups:
-      - ""
-    resourceNames:
-      - sealed-secrets-key
-    resources:
-      - secrets
-    verbs:
-      - get
-  - apiGroups:
-      - ""
-    resources:
-      - secrets
-    verbs:
-      - create
-      - list
+- apiGroups:
+  - ""
+  resources:
+  - secrets
+  verbs:
+  - create
+  - list
