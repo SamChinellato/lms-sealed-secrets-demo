@@ -3,8 +3,6 @@ kind: Kustomization
 resources:
 - namespace.yaml
 - serviceAccount.yaml
-- clusterRole.yaml
-- clusterRoleBinding.yaml
 - role-key-admin.yaml
 - role-service-proxier.yaml
 - roleBinding-key-admin.yaml

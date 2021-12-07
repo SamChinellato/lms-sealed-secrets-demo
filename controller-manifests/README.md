@@ -18,4 +18,8 @@ The target namespace is set to: `sealed-secrets`, if you want to change it, run 
 
     kustomize build | oc apply -f -
 
+See the pod:
+```
+oc get pods -n sealed-secrets
+```
 ---
