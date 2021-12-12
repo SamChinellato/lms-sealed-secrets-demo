@@ -1,0 +1,68 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: yasrs-pipeline
+spec:
+  params:
+    - name: SECRET_LENGTH
+    - name: PROJECT_NAME
+    - name: SECRET_NAME      
+    - name: DB_NAME
+    - name: USERNAME
+  tasks:
+    - name: force-key-renewal
+      taskRef:
+        kind: Task
+        name: force-key-renewal
+    - name: new-secret
+      params:
+        - name: SECRET_LENGTH
+          value: '20'
+        - name: PROJECT_NAME
+          value: 'database-demo'
+        - name: SECRET_NAME      
+          value: postgresql
+        - name: DB_NAME
+          value: db
+        - name: USERNAME
+          value: 'database_user'
+      runAfter:
+        - force-key-renewal
+      taskRef:
+        kind: Task
+        name: new-secret
+    - name: update-deployment
+      params:
+        - name: DEPLOYMENT
+          value: '20'
+        - name: TYPE
+          value: 'database-demo'
+        - name: NEW_SECRET_NAME      
+          value: # From New Secret Task
+      runAfter:
+        - new-secret
+      taskRef:
+        kind: Task
+        name: update-deployment
+    - name: seal-secret
+      params:
+        - name: NEW_SECRET_NAME      
+          value: # From New Secret Task
+      runAfter:
+        - new-secret
+      taskRef:
+        kind: Task
+        name: seal-secret
+    - name: commit
+      params:
+        - name: REPO
+          value: 'app-mod'
+        - name: SECRET-FILENAME
+          value: 'secret.yaml'
+      runAfter:
+        - seal-secret
+      taskRef:
+        kind: Task
+        name: commit
+  workspaces:
+    - name: pipeline-shared-data
