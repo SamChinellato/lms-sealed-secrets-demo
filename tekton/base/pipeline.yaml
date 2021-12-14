@@ -26,11 +26,16 @@ spec:
           value: db
         - name: USERNAME
           value: 'database_user'
-      runAfter:
-        - force-key-renewal
       taskRef:
         kind: Task
         name: new-secret
+    - name: git-pull
+      params:
+        - name: SECRET_LENGTH
+          value: '20'
+      taskRef:
+        kind: Task
+        name: git-pull
     - name: update-deployment
       params:
         - name: DEPLOYMENT
@@ -38,18 +43,20 @@ spec:
         - name: TYPE
           value: 'database-demo'
         - name: NEW_SECRET_NAME      
-          value: # From New Secret Task
+          value: $(tasks.new-secret.results.name)
       runAfter:
         - new-secret
+        - git-pull
       taskRef:
         kind: Task
         name: update-deployment
     - name: seal-secret
       params:
         - name: NEW_SECRET_NAME      
-          value: # From New Secret Task
+          value: $(tasks.new-secret.results.name)
       runAfter:
         - new-secret
+        - force-key-renewal
       taskRef:
         kind: Task
         name: seal-secret
@@ -61,6 +68,7 @@ spec:
           value: 'secret.yaml'
       runAfter:
         - seal-secret
+        - update-deployment
       taskRef:
         kind: Task
         name: commit
