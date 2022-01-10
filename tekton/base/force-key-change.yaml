@@ -5,17 +5,17 @@ metadata:
 spec:
   steps:
     - name: force-compromised
-      image: docker.io/alpine/k8s:1.20.7
+      image: image-registry.openshift-image-registry.svc:5000/openshift/tools
       script: |
         #!/bin/sh
 
-        SECRET_NAME=$(kubectl get secrets -l sealedsecrets.bitnami.com/sealed-secrets-key=active -n kube-system) 
+        SECRET_NAME=$(oc get secrets -l sealedsecrets.bitnami.com/sealed-secrets-key=active -n kube-system) 
         
         echo $SECRET_NAME
         
-        kubectl -n kube-system label secrets $(SECRET_NAME) sealedsecrets.bitnami.com/sealed-secrets-key=compromised --overwrite=true
+        oc -n kube-system label secrets $(SECRET_NAME) sealedsecrets.bitnami.com/sealed-secrets-key=compromised --overwrite=true
     - name: restart-pod
-      image: docker.io/alpine/k8s:1.20.7
+      image: image-registry.openshift-image-registry.svc:5000/openshift/tools
       script: |
         #!/bin/sh
 

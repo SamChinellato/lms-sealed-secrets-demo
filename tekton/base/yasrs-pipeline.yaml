@@ -1,0 +1,108 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: yasrs-pipeline
+spec:
+  params:
+    - name: source-repo
+    - name: sealed_secrets_controller_ns
+    - name: secret_length
+    - name: project_name
+    - name: secret_filename
+    - name: secret_name      
+    - name: sealed_secret_name
+    - name: db_name
+    - name: db_username
+  tasks:
+    - name: force-key-renewal
+      taskRef:
+        kind: Task
+        name: force-key-renewal
+    - name: new-secret
+      params:
+        - name: SECRET_LENGTH
+          value: "$(params.secret_length)"
+        - name: PROJECT_NAME
+          value: "$(params.project_name)"
+        - name: SECRET_NAME      
+          value: "$(params.secret_name)"
+        - name: SECRET_FILENAME
+          value: "$(params.secret_filename)"
+        - name: DB_NAME
+          value: "$(params.db_name)"
+        - name: DB_USERNAME
+          value: "$(params.db_username)" 
+      taskRef:
+        kind: Task
+        name: new-secret
+    - name: clone-repository
+      params:
+        - name: url
+          value: "$(params.source-repo)"
+      taskRef:
+        kind: ClusterTask
+        name: git-clone
+      workspaces:
+        - name: output
+          workspace: pipeline-shared-data
+    - name: generate-new-deployment
+      params:
+        - name: NEW_SECRET_NAME      
+          value: $(tasks.new-secret.results.name)
+      runAfter:
+        - new-secret
+        - clone-repository
+      taskRef:
+        kind: Task
+        name: generate-new-deployment
+    - name: seal-secret
+      params:
+        - name: SEALED_SECRETS_CONTROLLER_NS
+          value: $(params.sealed_secrets_controller_ns)
+        - name: INPUT_SECRET_FILENAME
+          value: $(params.secret_filename)
+        - name: OUTPUT_SEALED_SECRET
+          value: $(params.sealed_secret_name)
+      runAfter:
+        - new-secret
+        - force-key-renewal
+      taskRef:
+        kind: Task
+        name: seal-secret
+    - name: commit
+      runAfter:
+        - seal-secret
+        - generate-new-deployment
+      params:
+        - name: file
+          value: "deployment.yaml $(params.sealed_secret_name)"
+        - name: commitmessage
+          value: "updated new secret"
+        - name: email
+          value: tekton@ibmcloud.com
+        - name: username
+          value: "Tekton Pipeline"
+      taskRef:
+        kind: Task
+        name: git-push
+      workspaces:
+        - name: output
+          workspace: pipeline-shared-data
+    - name: deploy
+      params:
+        - name: app-namespace
+          value: "$(context.pipelineRun.namespace)"
+        - name: new-secret-name
+          value: $(tasks.new-secret.results.name)
+        - name: commit-sha
+          value: "$(tasks.commit.results.commit)"
+      runAfter:
+        - commit
+      taskRef:
+        kind: Task
+        name: deploy
+      workspaces:
+        - name: source
+          workspace: pipeline-shared-data
+  workspaces:
+    - name: pipeline-shared-data

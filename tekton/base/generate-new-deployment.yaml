@@ -1,0 +1,17 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: generate-new-deployment
+spec:
+  params:
+    - name: NEW_SECRET_NAME
+  steps:
+    - image: image-registry.openshift-image-registry.svc:5000/openshift/tools
+      name: patch-yaml
+      resources: {}
+      script: >
+        #!/bin/sh
+
+        oc process -f template/deployment-template.yaml \
+          -p SECRET_NAME="$(params.NEW_SECRET_NAME)" \
+          --local=true --raw=true -o yaml > deployment.yaml
