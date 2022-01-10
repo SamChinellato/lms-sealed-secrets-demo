@@ -1,0 +1,35 @@
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  generateName: yasrs-pipeline-run-
+spec:
+  params:
+    - name: source-repo
+      value: git@eu-gb.git.cloud.ibm.com:filenet-mvp/filenet-infra.git
+    - name: sealed_secrets_controller_ns
+      value: sealed-secrets
+    - name: secret_length
+      value: '20'
+    - name: project_name
+      value: 'database-demo'
+    - name: secret_name
+      value: 'postgresql'
+    - name: secret_filename
+      value: 'secret.yaml'
+    - name: sealed_secret_name
+      value: 'sealed-secret.yaml'
+    - name: db_name
+      value: 'db'
+    - name: db_username
+      value: 'database_user'
+  pipelineRef:
+    name: yasrs-pipeline
+  workspaces:
+    - name: pipeline-shared-data
+      volumeClaimTemplate:
+        spec:
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 1Gi
