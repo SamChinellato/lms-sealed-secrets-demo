@@ -27,7 +27,7 @@ spec:
     type: string
     description: git branch to add the file to
     default: "main"
-  - name: commitmessage
+  - name: commit_message
     type: string
     description: commit message to use
   - default: "true"
@@ -44,11 +44,9 @@ spec:
       the gitInitImage param with an image containing custom user configuration.
     name: userHome
     type: string
-
   results:
     - name: commit
       description: The precise commit SHA after the git operation.
-
   steps:
   - env:
     - name: HOME
@@ -83,7 +81,7 @@ spec:
       git config --global user.name "$(params.username)"
 
       git add $(params.file)
-      git commit -m "$(params.commitmessage)" --allow-empty
+      git commit -m "$(params.commit_message)" --allow-empty
       git push $(params.remote) HEAD:$(params.branch)
 
       RESULT_SHA="$(git rev-parse HEAD | tr -d '\n')"

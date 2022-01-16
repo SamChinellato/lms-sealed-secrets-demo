@@ -9,8 +9,9 @@ spec:
     - name: secret_length
     - name: project_name
     - name: secret_filename
+    - name: sealed_secret_filename
+    - name: deployment_filename
     - name: secret_name      
-    - name: sealed_secret_name
     - name: db_name
     - name: db_username
   tasks:
@@ -62,7 +63,7 @@ spec:
         - name: INPUT_SECRET_FILENAME
           value: $(params.secret_filename)
         - name: OUTPUT_SEALED_SECRET
-          value: $(params.sealed_secret_name)
+          value: $(params.sealed_secret_filename)
       runAfter:
         - new-secret
         - force-key-renewal
@@ -75,8 +76,8 @@ spec:
         - generate-new-deployment
       params:
         - name: file
-          value: "deployment.yaml $(params.sealed_secret_name)"
-        - name: commitmessage
+          value: "$(params.deployment_filename) $(params.sealed_secret_filename)"
+        - name: commit_message
           value: "updated new secret"
         - name: email
           value: tekton@ibmcloud.com

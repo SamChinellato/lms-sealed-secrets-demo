@@ -12,12 +12,14 @@ spec:
       value: '20'
     - name: project_name
       value: 'database-demo'
-    - name: secret_name
-      value: 'postgresql'
     - name: secret_filename
       value: 'secret.yaml'
-    - name: sealed_secret_name
+    - name: sealed_secret_filename
       value: 'sealed-secret.yaml'
+    - name: deployment_filename
+      value: 'k8s/deployment.yaml'
+    - name: secret_name
+      value: 'postgresql'
     - name: db_name
       value: 'db'
     - name: db_username
