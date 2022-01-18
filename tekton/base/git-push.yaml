@@ -16,7 +16,7 @@ spec:
   - name: email
     type: string
     description: email address to use for performing git push
-  - name: file
+  - name: files
     type: string
     description: file to push
   - name: remote
@@ -80,8 +80,10 @@ spec:
       git config --global user.email "$(params.email)"
       git config --global user.name "$(params.username)"
 
-      git add $(params.file)
-      git commit -m "$(params.commit_message)" --allow-empty
+      cp $(params.files) ./k8s 
+      git add ./k8s 
+
+      git commit -m "$(params.commit_message)"
       git push $(params.remote) HEAD:$(params.branch)
 
       RESULT_SHA="$(git rev-parse HEAD | tr -d '\n')"

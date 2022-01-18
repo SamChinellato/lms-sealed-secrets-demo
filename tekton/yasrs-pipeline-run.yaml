@@ -5,7 +5,7 @@ metadata:
 spec:
   params:
     - name: source-repo
-      value: git@eu-gb.git.cloud.ibm.com:filenet-mvp/filenet-infra.git
+      value: git@github.ibm.com:itg-europe-appmod-devops-cop/postgresql-sample.git
     - name: sealed_secrets_controller_ns
       value: sealed-secrets
     - name: secret_length
@@ -17,7 +17,7 @@ spec:
     - name: sealed_secret_filename
       value: 'sealed-secret.yaml'
     - name: deployment_filename
-      value: 'k8s/deployment.yaml'
+      value: 'deployment.yaml'
     - name: secret_name
       value: 'postgresql'
     - name: db_name
