@@ -34,4 +34,13 @@ spec:
 
         echo "restarting sealed secrets controller pod..."
 
-        oc rollout restart deployment/sealed-secrets-controller              
+        PODNAME=$(oc get pod -n $(params.NAMESPACE) \
+         -l  name=sealed-secrets-controller | grep sealed-secrets-controller- | awk '{print $1}')
+
+        echo "deleting pod $PODNAME ..."
+        oc delete pod -n $(params.NAMESPACE) \
+         $PODNAME
+
+        echo "waiting for sealed secrets controller to be in a ready state..."
+
+        oc wait -n $(params.NAMESPACE) --for condition=available deployment/sealed-secrets-controller --timeout=300s
