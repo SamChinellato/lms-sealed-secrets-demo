@@ -76,6 +76,8 @@ spec:
           value: $(params.secret_filename)
         - name: OUTPUT_SEALED_SECRET
           value: $(params.sealed_secret_filename)
+        - name: TARGET_NAMESPACE
+          value: "$(params.project_name)"
       runAfter:
         - new-secret
         - force-key-change

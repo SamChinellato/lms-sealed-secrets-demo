@@ -11,7 +11,7 @@ spec:
     - name: secret_length
       value: '20'
     - name: project_name
-      value: 'database-demo'
+      value: 'postgresql'
     - name: secret_filename
       value: 'secret.yaml'
     - name: sealed_secret_filename
