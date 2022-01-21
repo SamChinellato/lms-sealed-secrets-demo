@@ -1,0 +1,75 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: seal-secret-pipeline
+spec:
+  params:
+    - name: source-repo
+    - name: sealed_secrets_controller_ns
+    - name: secret_name   
+    - name: namespace   
+    - name: target-namespace
+    - name: secret_filename
+    - name: sealed_secret_filename
+  tasks:
+    - name: get-secret
+      workspaces:
+        - name: source
+          workspace: pipeline-shared-data
+      params:
+        - name: SECRET_NAME      
+          value: "$(params.secret_name)"
+        - name: NAMESPACE
+          value: "$(params.namespace)"
+      taskRef:
+        kind: Task
+        name: get-secret
+    - name: clone-repository
+      params:
+        - name: url
+          value: "$(params.source-repo)"
+      taskRef:
+        kind: ClusterTask
+        name: git-clone
+      workspaces:
+        - name: output
+          workspace: pipeline-shared-data
+    - name: seal-secret
+      workspaces:
+        - name: source
+          workspace: pipeline-shared-data
+      params:
+        - name: SEALED_SECRETS_CONTROLLER_NS
+          value: $(params.sealed_secrets_controller_ns)
+        - name: INPUT_SECRET
+          value: $(params.secret_filename)
+        - name: OUTPUT_SEALED_SECRET
+          value: $(params.sealed_secret_filename)
+        - name: TARGET_NAMESPACE
+          value: "$(params.target-namespace)"
+      runAfter:
+        - get-secret
+      taskRef:
+        kind: Task
+        name: seal-secret
+    - name: commit
+      runAfter:
+        - seal-secret
+        - clone-repository
+      params:
+        - name: files
+          value: "$(params.sealed_secret_filename)"
+        - name: commit_message
+          value: "updated new secret"
+        - name: email
+          value: tekton@ibmcloud.com
+        - name: username
+          value: "Tekton Pipeline"
+      taskRef:
+        kind: Task
+        name: git-push
+      workspaces:
+        - name: output
+          workspace: pipeline-shared-data
+  workspaces:
+    - name: pipeline-shared-data
