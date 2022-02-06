@@ -5,15 +5,25 @@ metadata:
 spec:
   params:
     - name: source-repo
+      type: string
     - name: sealed_secrets_controller_ns
+      type: string
     - name: secret_length
+      type: string
     - name: project_name
+      type: string
     - name: secret_filename
+      type: string
     - name: sealed_secret_filename
+      type: string
     - name: deployment_filename
+      type: string
     - name: secret_name      
+      type: string
     - name: db_name
+      type: string
     - name: db_username
+      type: string
   tasks:
     - name: force-key-change
       workspaces:
