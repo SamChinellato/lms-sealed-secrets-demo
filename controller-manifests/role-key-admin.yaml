@@ -1,4 +1,4 @@
-apiVersion: rbac.authorization.k8s.io/v1beta1
+apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   annotations: {}
@@ -6,10 +6,18 @@ metadata:
     name: sealed-secrets-key-admin
   name: sealed-secrets-key-admin
 rules:
-- apiGroups:
-  - ""
-  resources:
-  - secrets
-  verbs:
-  - create
-  - list
+  - apiGroups:
+      - ""
+    resourceNames:
+      - sealed-secrets-key
+    resources:
+      - secrets
+    verbs:
+      - get
+  - apiGroups:
+      - ""
+    resources:
+      - secrets
+    verbs:
+      - create
+      - list

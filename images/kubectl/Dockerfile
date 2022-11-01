@@ -1,6 +1,6 @@
 FROM registry.access.redhat.com/ubi8:latest
 
-ENV KUBECTL_VERSION=1.23.0
+ENV KUBECTL_VERSION=1.25.3
 
 RUN curl -LO https://dl.k8s.io/release/v${KUBECTL_VERSION}/bin/linux/amd64/kubectl
 
