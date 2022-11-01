@@ -5,7 +5,7 @@ metadata:
 spec:
   params:
     - name: source-repo
-      value: git@github.ibm.com:itg-europe-appmod-devops-cop/postgresql-sample.git
+      value: git@github.com:linux-foundation-summit-sealed-secrets/lms-postgres-sample.git
     - name: sealed_secrets_controller_ns
       value: sealed-secrets
     - name: secret_length
