@@ -1,0 +1,8 @@
+apiVersion: triggers.tekton.dev/v1alpha1
+kind: TriggerBinding
+metadata:
+  name: bind-twilio-trigger
+spec:
+  params:
+    - name: source-repo
+      value: $(body.git-ssh-url)

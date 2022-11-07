@@ -5,7 +5,7 @@ This repository sets up a demo for sealed secrets.
 ## Prerequisites
 
 
-* Install the `Openshift Pipeline` and `OpenShift GitOps` operators.
+Install the `Openshift Pipeline` and `OpenShift GitOps` operators.
 
 ---
 

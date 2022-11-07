@@ -23,49 +23,58 @@ spec:
       labels:
         name: sealed-secrets-controller
     spec:
-      containers:
-      - args: []
-        command:
-        - controller
-        env:
-        - name: SEALED_SECRETS_UPDATE_STATUS
-          value: "1"
-        image: quay.io/bitnami/sealed-secrets-controller:v0.16.0
-        resources:
-          requests:
-            memory: "50Mi"
-            cpu: "50m"
-          limits:
-            memory: "128Mi"
-            cpu: "500m"
-        imagePullPolicy: Always
-        livenessProbe:
-          httpGet:
-            path: /healthz
-            port: http
-        name: sealed-secrets-controller
-        ports:
-        - containerPort: 8080
-          name: http
-        readinessProbe:
-          httpGet:
-            path: /healthz
-            port: http
-        securityContext:
-          readOnlyRootFilesystem: true
-          runAsNonRoot: true
-          runAsUser: 1001
-        stdin: false
-        tty: false
-        volumeMounts:
-        - mountPath: /tmp
-          name: tmp
-      imagePullSecrets: []
-      initContainers: []
       securityContext:
         fsGroup: 65534
       serviceAccountName: sealed-secrets-controller
       terminationGracePeriodSeconds: 30
+      containers:
+      - name: sealed-secrets-controller
+        env:
+        - name: SEALED_SECRETS_UPDATE_STATUS
+          value: "1"
+        command:
+          - controller
+        args:
+          - --update-status
+          - --key-prefix
+          - "sealed-secrets-key"
+        image: docker.io/bitnami/sealed-secrets-controller:v0.19.1
+        imagePullPolicy: Always
+        ports:
+          - containerPort: 8080
+            name: http
+        livenessProbe:
+          failureThreshold: 3
+          initialDelaySeconds: 0
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
+          httpGet:
+            path: /healthz
+            port: http
+        readinessProbe:
+          failureThreshold: 3
+          initialDelaySeconds: 0
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
+          httpGet:
+            path: /healthz
+            port: http
+        resources:
+          limits:
+            cpu: 500m
+            memory: 128Mi
+          requests:
+            cpu: 50m
+            memory: 50Mi
+        securityContext:
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          runAsUser: 1001
+        volumeMounts:
+          - mountPath: /tmp
+            name: tmp
       volumes:
-      - emptyDir: {}
-        name: tmp
+        - name: tmp
+          emptyDir: {}

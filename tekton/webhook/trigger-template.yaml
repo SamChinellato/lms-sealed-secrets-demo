@@ -1,0 +1,46 @@
+apiVersion: triggers.tekton.dev/v1alpha1
+kind: TriggerTemplate
+metadata:
+  name: twilio-trigger
+spec:
+  params:
+    - name: source-repo
+    - name: user-binding
+  resourcetemplates:
+    - apiVersion: tekton.dev/v1beta1
+      kind: PipelineRun
+      metadata:
+        generateName: yasrs-pipeline-run-
+      spec:
+        params:
+          - name: source-repo
+            value: $(tt.params.source-repo)
+          - name: sealed_secrets_controller_ns
+            value: sealed-secrets
+          - name: secret_length
+            value: '20'
+          - name: project_name
+            value: 'postgresql'
+          - name: secret_filename
+            value: 'secret.yaml'
+          - name: sealed_secret_filename
+            value: 'sealed-secret.yaml'
+          - name: deployment_filename
+            value: 'deployment.yaml'
+          - name: secret_name
+            value: 'postgresql'
+          - name: db_name
+            value: 'db'
+          - name: db_username
+            value: 'database_user'
+        pipelineRef:
+          name: yasrs-pipeline
+        workspaces:
+          - name: pipeline-shared-data
+            volumeClaimTemplate:
+              spec:
+                accessModes:
+                  - ReadWriteOnce
+                resources:
+                  requests:
+                    storage: 1Gi

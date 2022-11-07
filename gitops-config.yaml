@@ -37,7 +37,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: 'git@github.ibm.com:itg-europe-appmod-devops-cop/postgresql-sample.git'
+    repoURL: 'git@github.com:linux-foundation-summit-sealed-secrets/lms-postgres-sample.git'
     path: ./k8s
     targetRevision: HEAD
   destination:

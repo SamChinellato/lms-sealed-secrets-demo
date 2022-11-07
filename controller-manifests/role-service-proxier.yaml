@@ -1,4 +1,4 @@
-apiVersion: rbac.authorization.k8s.io/v1beta1
+apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   annotations: {}
@@ -6,13 +6,22 @@ metadata:
     name: sealed-secrets-service-proxier
   name: sealed-secrets-service-proxier
 rules:
-- apiGroups:
-  - ""
-  resourceNames:
-  - 'http:sealed-secrets-controller:'
-  - sealed-secrets-controller
-  resources:
-  - services/proxy
-  verbs:
-  - create
-  - get
+  - apiGroups:
+      - ""
+    resourceNames:
+      - sealed-secrets
+    resources:
+      - services
+    verbs:
+      - get
+  - apiGroups:
+      - ""
+    resourceNames:
+      - 'http:sealed-secrets:'
+      - 'http:sealed-secrets:http'
+      - sealed-secrets
+    resources:
+      - services/proxy
+    verbs:
+      - create
+      - get
