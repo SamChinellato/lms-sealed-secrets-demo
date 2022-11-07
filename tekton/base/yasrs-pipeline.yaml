@@ -18,7 +18,7 @@ spec:
       type: string
     - name: deployment_filename
       type: string
-    - name: secret_name      
+    - name: secret_name
       type: string
     - name: db_name
       type: string
@@ -32,49 +32,38 @@ spec:
       taskRef:
         kind: Task
         name: force-key-change
-    - name: new-secret
-      workspaces:
-        - name: source
-          workspace: pipeline-shared-data
-      params:
-        - name: SECRET_LENGTH
-          value: "$(params.secret_length)"
-        - name: PROJECT_NAME
-          value: "$(params.project_name)"
-        - name: SECRET_NAME      
-          value: "$(params.secret_name)"
-        - name: SECRET_FILENAME
-          value: "$(params.secret_filename)"
-        - name: DB_NAME
-          value: "$(params.db_name)"
-        - name: DB_USERNAME
-          value: "$(params.db_username)" 
-      taskRef:
-        kind: Task
-        name: new-secret
     - name: clone-repository
       params:
         - name: url
-          value: "$(params.source-repo)"
+          value: '$(params.source-repo)'
       taskRef:
         kind: ClusterTask
         name: git-clone
       workspaces:
         - name: output
           workspace: pipeline-shared-data
-    - name: generate-new-deployment
+    - name: new-secret
       workspaces:
         - name: source
           workspace: pipeline-shared-data
       params:
-        - name: NEW_SECRET_NAME      
-          value: $(tasks.new-secret.results.name)
-      runAfter:
-        - new-secret
-        - clone-repository
+        - name: SECRET_LENGTH
+          value: '$(params.secret_length)'
+        - name: PROJECT_NAME
+          value: '$(params.project_name)'
+        - name: SECRET_NAME
+          value: '$(params.secret_name)'
+        - name: SECRET_FILENAME
+          value: '$(params.secret_filename)'
+        - name: DB_NAME
+          value: '$(params.db_name)'
+        - name: DB_USERNAME
+          value: '$(params.db_username)'
       taskRef:
         kind: Task
-        name: generate-new-deployment
+        name: new-secret
+      runAfter:
+        - clone-repository
     - name: seal-secret
       workspaces:
         - name: source
@@ -87,26 +76,37 @@ spec:
         - name: OUTPUT_SEALED_SECRET
           value: $(params.sealed_secret_filename)
         - name: TARGET_NAMESPACE
-          value: "$(params.project_name)"
+          value: '$(params.project_name)'
       runAfter:
         - new-secret
         - force-key-change
       taskRef:
         kind: Task
         name: seal-secret
-    - name: commit
+    - name: generate-new-deployment
+      workspaces:
+        - name: source
+          workspace: pipeline-shared-data
+      params:
+        - name: NEW_SECRET_NAME
+          value: $(tasks.new-secret.results.name)
       runAfter:
         - seal-secret
+      taskRef:
+        kind: Task
+        name: generate-new-deployment
+    - name: commit
+      runAfter:
         - generate-new-deployment
       params:
         - name: files
-          value: "$(params.deployment_filename) $(params.sealed_secret_filename)"
+          value: '$(params.deployment_filename) $(params.sealed_secret_filename)'
         - name: commit_message
-          value: "updated new secret"
+          value: 'updated new secret'
         - name: email
           value: tekton@ibmcloud.com
         - name: username
-          value: "Tekton Pipeline"
+          value: 'Tekton Pipeline'
       taskRef:
         kind: Task
         name: git-push
